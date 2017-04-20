@@ -18,6 +18,8 @@
   "homepage": "https://github.com/molinarap/tf-idf_project#readme",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "natural": "^0.5.1"
+    "fs": "0.0.1-security",
+    "natural": "^0.5.1",
+    "path": "^0.12.7"
   }
 }
