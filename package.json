@@ -1,0 +1,23 @@
+{
+  "name": "tf-idf_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/molinarap/tf-idf_project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/molinarap/tf-idf_project/issues"
+  },
+  "homepage": "https://github.com/molinarap/tf-idf_project#readme",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "natural": "^0.5.1"
+  }
+}
