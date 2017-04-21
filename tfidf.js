@@ -15,7 +15,8 @@ Promise.promisifyAll(fs);
 var d = new Date();
 d = d.toDateString();
 
-var initText = "La funzione di peso tf-idf (term frequency–inverse document frequency) è una funzione utilizzata in information retrieval per misurare l'importanza di un termine rispetto ad un documento o ad una collezione di documenti. Tale funzione aumenta proporzionalmente al numero di volte che il termine è contenuto nel documento, ma cresce in maniera inversamente proporzionale con la frequenza del termine nella collezione. L'idea alla base di questo comportamento è di dare più importanza ai termini che compaiono nel documento, ma che in generale sono poco frequenti.";
+var initText0 = 'Il cane della bambina è di colore nero perchè ad Anna piacciono i cani neri. tu hai un cane?';
+var initText1 = 'Molti cani neri fanno parte di una razza pregiata. tu hai un cane nero?';
 var fileTXT = './data/test.txt';
 var fileJSON = './data/test.json';
 var filePROP = './data/test.properties';
@@ -32,15 +33,22 @@ exports.readText = readText;
 var findTerm = function(text) {
     return new Promise(function(resolve, reject) {
         var tfidf = new natural.TfIdf();
-        //tfidf.addDocument(text);
-        tfidf.addFileSync(filePROP);
-        var tf = tfidf.documents[0];
-        delete tf["__key"];
-        var finalTfidf = []
-        tfidf.listTerms(0).forEach(function(item) {
-            item.tf = tf[item.term];
-            finalTfidf.push(item)
+        //tfidf.addDocument(initText0);
+        //tfidf.addDocument(initText1);
+        tfidf.addFileSync('./data/test.txt');
+        tfidf.addFileSync('./data/test1.txt');
+        var tf = [];
+        var finalTfidf = [];
+        tfidf.documents.forEach(function(elem, i) {
+            delete elem["__key"];
+            var finalTfidf2 = [];
+            tfidf.listTerms(i).forEach(function(item) {
+                item.tf = elem[item.term];
+                finalTfidf2.push(item)
+            });
+            finalTfidf.push(finalTfidf2)
         });
+        console.log(finalTfidf)
         resolve(finalTfidf);
     });
 };
@@ -56,29 +64,48 @@ var regexStopWords = function(k) {
 };
 exports.regexStopWords = regexStopWords;
 
-var removeStopWords = function(elem) {
-    if (regexStopWords(elem.term)) {
-        elem.stopWord = true;
-    } else {
-        elem.stopWord = false;
-    }
-    return elem;
+function removeStopWords(word) {
+    Promise.map(word, function(word) {
+        if (regexStopWords(word.term)) {
+            word.stopWord = true;
+        } else {
+            word.stopWord = false;
+        }
+        //console.log(word)
+        return word;
+    })
+
 };
 exports.removeStopWords = removeStopWords;
 
 function writeJSONFile(data) {
     var s = JSON.stringify(data, null, "\t")
-    return fs.writeFileAsync('./storage/prova.json', s);
+    return fs.writeFileAsync('./storage/prova.json', s)
+        .then(function() {
+            return data;
+        });
 }
 exports.writeJSONFile = writeJSONFile;
 
-findTerm(initText)
-    .map(word => removeStopWords(word))
-    .then(function(res2) {
-        return writeJSONFile(res2)
+findTerm()
+    .each(document => removeStopWords(document))
+    .then(function(res1) {
+        return writeJSONFile(res1)
     })
-    .then(function() {
-        console.log("THE END!");
+    .then(function(res2) {
+        console.log("FILE JSON CREATO! ;)");
+        var new_array = [];
+        res2.forEach(function(elem, i) {
+            if (new_array.length < 5) {
+                if (!elem.stopWord) {
+                    new_array.push(elem);
+                }
+            }
+        })
+        return new_array
+    })
+    .then(function(res3) {
+        console.log(res3);
     })
     .catch(function(e) {
         console.error('ERROR PROMISE --->' + e);
